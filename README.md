@@ -29,13 +29,13 @@ class Console
 {
     init(str) 
     {
-		    this.name = str;
-	  }
+	this.name = str;
+    }
 
-	  Write() 
+    Write() 
     {
-		    print "Hello, " + this.name + "!";
-	  }
+        print "Hello, " + this.name + "!";
+    }
 }
 
 var cw = Console("Word");
