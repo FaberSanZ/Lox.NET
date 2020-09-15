@@ -27,19 +27,39 @@ The code is licensed under MIT. Feel free to use it for whatever purpose.
 
 class Console 
 {
-    init(str) 
+    Console(str) 
     {
-	this.name = str;
+	    this.name = str;
     }
 
-    Write() 
+    WriteDebug() 
     {
-        print "Hello, " + this.name + "!";
+        print this.name;
+    }
+
+    Write(str) 
+    {
+        print str;
     }
 }
 
-var cw = Console("Word");
+class Program
+{
+    Program()
+    {
 
-cw.Write();
+    }
+
+    Main()
+    {
+        let cw = Console("Debug Init");
+
+        cw.Write("Hello Word 0");
+        cw.Write("Hello Word 1");
+        cw.Write("Hello Word 2");
+        cw.Write("Hello Word 3");
+        cw.WriteDebug();
+    }
+}
 ```
 
