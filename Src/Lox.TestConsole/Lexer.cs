@@ -4,17 +4,17 @@ using static Lox.Functional;
 
 namespace Lox
 {
-    internal sealed class Scanner
+    public class Lexer
     {
-        private readonly string _source;
-        private readonly List<Token> _tokens = new List<Token>();
-        private readonly List<Error> _errors = new List<Error>();
+        private string _source;
+        internal List<Token> _tokens = new List<Token>();
+        internal List<Error> _errors = new List<Error>();
 
         private int _start = 0;
         private int _current = 0;
         private int _line = 1;
 
-        internal static readonly Dictionary<string, TokenType> Keywords = new Dictionary<string, TokenType>
+        internal readonly Dictionary<string, TokenType> Keywords = new Dictionary<string, TokenType>
         {
             {"if",     TokenType.If},
             {"else",   TokenType.Else},
@@ -31,21 +31,22 @@ namespace Lox
             {"this",   TokenType.This},
             {"super",  TokenType.Super},
             {"let",    TokenType.Var},
+            {"var",    TokenType.Var},
             {"print",  TokenType.Print },
 
         };
 
-        public IEnumerable<Token> GetTokens()
+        internal IEnumerable<Token> GetTokens()
         {
             return _tokens;
         }
 
-        public IEnumerable<Error> GetErrors()
+        internal IEnumerable<Error> GetErrors()
         {
             return _errors;
         }
 
-        public Scanner(string source)
+        public Lexer(string source)
         {
             _source = source;
 
@@ -91,19 +92,43 @@ namespace Lox
                     AddToken(TokenType.RightBrace); 
                     break;
 
-                case ',': AddToken(TokenType.Comma); break;
-                case '.': AddToken(TokenType.Dot); break;
-                case '-': AddToken(TokenType.Minus); break;
-                case '+': AddToken(TokenType.Plus); break;
-                case ';': AddToken(TokenType.Semicolon); break;
-                case '*': AddToken(TokenType.Star); break;
+                case ',': AddToken(TokenType.Comma); 
+                    break;
 
-                case '!': AddToken(Match('=') ? TokenType.BangEqual : TokenType.Bang); break;
-                case '=': AddToken(Match('=') ? TokenType.EqualEqual : TokenType.Equal); break;
-                case '<': AddToken(Match('=') ? TokenType.LessEqual : TokenType.Less); break;
-                case '>': AddToken(Match('=') ? TokenType.GreaterEqual : TokenType.Greater); break;
-                case '&': AddToken(TokenType.And); break;
-                case '|': AddToken(TokenType.Or); break;
+                case '.': AddToken(TokenType.Dot); 
+                    break;
+
+                case '-': AddToken(TokenType.Minus); 
+                    break;
+
+                case '+': AddToken(TokenType.Plus); 
+                    break;
+
+                case ';': AddToken(TokenType.Semicolon); 
+                    break;
+
+                case '*': AddToken(TokenType.Star); 
+                    break;
+
+
+                case '!': AddToken(Match('=') ? TokenType.BangEqual : TokenType.Bang); 
+                    break;
+
+                case '=': AddToken(Match('=') ? TokenType.EqualEqual : TokenType.Equal); 
+                    break;
+
+                case '<': AddToken(Match('=') ? TokenType.LessEqual : TokenType.Less); 
+                    break;
+
+                case '>': AddToken(Match('=') ? TokenType.GreaterEqual : TokenType.Greater); 
+                    break;
+
+                case '&': AddToken(TokenType.And); 
+                    break;
+
+                case '|': AddToken(TokenType.Or); 
+                    break;
+
 
                 case '/':
                     if (Match('/')) //comment
@@ -129,7 +154,8 @@ namespace Lox
                     _line++;
                     break;
 
-                case '"': String(); break;
+                case '"': String(); 
+                    break;
 
                 default:
                     if (IsDigit(c))

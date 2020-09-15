@@ -1,4 +1,6 @@
-﻿namespace Lox
+﻿using System.Collections.Generic;
+
+namespace Lox
 {
     sealed class UnaryExpression : SyntaxNode
     {
@@ -12,5 +14,12 @@
         }
 
         public SyntaxKind Kind => SyntaxKind.UnaryExpression;
+
+
+        //public IEnumerable<SyntaxNode> GetNodes()
+        //{
+        //    yield return Right;
+        //    yield return this;
+        //}
     }
 }

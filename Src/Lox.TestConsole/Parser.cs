@@ -103,7 +103,7 @@ namespace Lox
             List<FunctionStatement> methods = new List<FunctionStatement>();
             while (!Check(TokenType.RightBrace) && !IsAtEnd())
             {
-                methods.Add((FunctionStatement)ParseFunctionDeclaration("method"));
+                methods.Add((FunctionStatement)ParseFunctionDeclaration("method") as FunctionStatement);
             }
             Consume(TokenType.RightBrace, "Expect '}' after class Body.");
             return new ClassStatement(name, superclass, methods);
@@ -285,15 +285,13 @@ namespace Lox
                 Token equals = Previous();
                 SyntaxNode value = ParseAssignmentExpression();
 
-                if (expr is VariableExpression)
+                if (expr is VariableExpression e)
                 {
-                    Token name = ((VariableExpression)expr).Name;
-                    return new AssignmentExpression(name, value);
+                    return new AssignmentExpression(e.Name, value);
                 }
-                else if (expr is GetExpression)
+                else if (expr is GetExpression g)
                 {
-                    GetExpression get = (GetExpression)expr;
-                    return new SetExpression(get.Object, get.Name, value);
+                    return new SetExpression(g.Object, g.Name, value);
                 }
 
                 Error(equals, "Invalid Assignment Target");

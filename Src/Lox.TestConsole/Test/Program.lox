@@ -1,7 +1,40 @@
-for(var i = 0; i < 10; i = i + 1)
+class Console 
 {
-	print i + 1;
+    Console(str) 
+    {
+	    this.name = str;
+    }
+
+    WriteDebug() 
+    {
+        print this.name;
+    }
+
+    Write(str) 
+    {
+        print str;
+    }
 }
-	
+
+class Program
+{
+    Program()
+    {
+
+    }
+
+    Main()
+    {
+        let cw = Console("Debug Init");
+
+        cw.Write("Hello Word 0");
+        cw.Write("Hello Word 1");
+        cw.Write("Hello Word 2");
+        cw.Write("Hello Word 3");
+        cw.WriteDebug();
+    }
+}
+
+
 
  

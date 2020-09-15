@@ -9,7 +9,7 @@ namespace Lox
         private Evaluator _evaluator = new Evaluator();
         public bool Run(string source)
         {
-            var scanner = new Scanner(source);
+            var scanner = new Lexer(source);
             scanner.ScanTokens();
 
             var parser = new Parser(scanner.GetTokens().ToList());

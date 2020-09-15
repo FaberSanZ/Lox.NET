@@ -133,7 +133,9 @@ namespace Lox
             switch (expression.Kind)
             {
                 case SyntaxKind.PrintStatement:
-                    object result = Evaluate(((PrintStatement)expression).Expression);
+                    var e = (expression as PrintStatement).Expression.Kind; 
+ 
+                    object result = Evaluate((expression as PrintStatement).Expression);
                     Console.WriteLine(result);
                     return System.ValueTuple.Create();
 
@@ -142,41 +144,59 @@ namespace Lox
                     return System.ValueTuple.Create();
 
                 case SyntaxKind.VariableDeclarationStatement:
-                    return EvaluateVariableDeclartionStatement((VariableDeclarationStatement)expression);
+                    return EvaluateVariableDeclartionStatement(expression as VariableDeclarationStatement);
+
                 case SyntaxKind.IfStatement:
                     return EvaluateIfStatement((IfStatement)expression);
+
                 case SyntaxKind.WhileStatement:
                     return EvaluateWhileStatement((WhileStatement)expression);
+
                 case SyntaxKind.BlockStatement:
                     return EvaluateBlockStatement((BlockStatement)expression);
+
                 case SyntaxKind.FunctionStatement:
                     return EvaluateFunctionStatement((FunctionStatement)expression);
+
                 case SyntaxKind.ClassStatement:
                     return EvaluateClassStatement((ClassStatement)expression);
+
                 case SyntaxKind.ReturnStatement:
                     return EvaluateReturnStatement((ReturnStatement)expression);
+
                 case SyntaxKind.CallExpression:
                     return EvaluateCallExpression((CallExpression)expression);
+
                 case SyntaxKind.VariableExpression:
                     return EvaluateVariableExpression((VariableExpression)expression);
+
                 case SyntaxKind.AssignmentExpression:
                     return EvaluateAssignmentExpression((AssignmentExpression)expression);
+
                 case SyntaxKind.BinaryExpression:
                     return EvaluateBinaryExpression((BinaryExpression)expression);
+
                 case SyntaxKind.GroupingExpression:
                     return EvaluateGroupingExpression((GroupingExpression)expression);
+
                 case SyntaxKind.UnaryExpression:
                     return EvaluateUnaryExpression((UnaryExpression)expression);
+
                 case SyntaxKind.LiteralExpression:
                     return EvaluateLiteralExpression((LiteralExpression)expression);
+
                 case SyntaxKind.GetExpression:
                     return EvaluateGetExpression((GetExpression)expression);
+
                 case SyntaxKind.SetExpression:
                     return EvaluateSetExpression((SetExpression)expression);
+
                 case SyntaxKind.ThisExpression:
                     return EvaluateThisExpression((ThisExpression)expression);
+
                 case SyntaxKind.SuperExpression:
                     return EvaluateSuperExpression((SuperExpression)expression);
+
                 default:
                     throw new NotSupportedException();
             }
@@ -245,7 +265,7 @@ namespace Lox
             Dictionary<string, LoxFunction> methods = new Dictionary<string, LoxFunction>();
             foreach (FunctionStatement method in expr.Methods)
             {
-                LoxFunction function = new LoxFunction(method, _environment, method.Name.Lexeme.Equals("init"));
+                LoxFunction function = new LoxFunction(method, _environment, method.Name.Lexeme.Equals("constructor"));
                 methods.Add(method.Name.Lexeme, function);
             }
             LoxClass klass = new LoxClass(expr.Name.Lexeme, (LoxClass)superclass, methods);
@@ -404,9 +424,9 @@ namespace Lox
                 return false;
             }
 
-            if (obj is bool)
+            if (obj is bool b)
             {
-                return (bool)obj;
+                return b;
             }
 
             return true;
@@ -436,7 +456,7 @@ namespace Lox
                     return (double)left / (double)right;
 
                 case TokenType.Plus:
-                    if (left is double  l && right is double r)
+                    if (left is double l && right is double r)
                     {
                         return l + r;
                     }

@@ -1,17 +1,16 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 
 namespace Lox.TestConsole
 {
     internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
-
+            bool main = true;
             string source = File.ReadAllText(@"Test\Program.lox");
+            if (main) source += "let init = Program(); init.Main();";
             LoxInterpreter interpreter = new LoxInterpreter();
             interpreter.Run(source);
         }
     }
-
 }

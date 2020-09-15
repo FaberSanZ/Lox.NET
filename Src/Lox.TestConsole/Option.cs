@@ -31,7 +31,7 @@ namespace Lox
 
         public override string ToString()
         {
-            return "nil";
+            return "null";
         }
 
     }
@@ -74,7 +74,7 @@ namespace Lox
 
         public override string ToString()
         {
-            return "nil";
+            return "null";
         }
     }
 
