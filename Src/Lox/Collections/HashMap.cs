@@ -19,13 +19,12 @@ namespace Lox.Collections
 
         public V Put(K key, V value)
         {
-            V old_value = default(V);
+            V old_value = default;
 
             if (ContainsKey(key))
             {
                 old_value = this[key];
                 this[key] = value;
-
             }
             else
             {
