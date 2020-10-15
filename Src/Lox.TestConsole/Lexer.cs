@@ -16,24 +16,23 @@ namespace Lox
 
         internal readonly Dictionary<string, TokenType> Keywords = new Dictionary<string, TokenType>
         {
-            {"if",     TokenType.If},
-            {"else",   TokenType.Else},
-            {"true",   TokenType.True},
-            {"false",  TokenType.False},
-            {"and", TokenType.AndAnd},
-            {"or", TokenType.OrOr},
-            {"for",    TokenType.For},
-            {"while",  TokenType.While},
-            {"funtion",    TokenType.Fun},
-            {"null",    TokenType.Nil},
-            {"return", TokenType.Return},
-            {"class",  TokenType.Class},
-            {"this",   TokenType.This},
-            {"super",  TokenType.Super},
-            {"let",    TokenType.Var},
-            {"var",    TokenType.Var},
-            {"print",  TokenType.Print },
-
+            ["if"] = TokenType.If,
+            ["else"] = TokenType.Else,
+            ["true"] = TokenType.True,
+            ["false"] = TokenType.False,
+            ["and"] = TokenType.AndAnd,
+            ["or"] = TokenType.OrOr,
+            ["for"] = TokenType.For,
+            ["while"] = TokenType.While,
+            ["funtion"] = TokenType.Fun,
+            ["null"] = TokenType.Nil,
+            ["return"] = TokenType.Return,
+            ["class"] = TokenType.Class,
+            ["this"] = TokenType.This,
+            ["super"] = TokenType.Super,
+            ["let"] = TokenType.Var,
+            ["var"] = TokenType.Var,
+            ["print"] = TokenType.Print,
         };
 
         internal IEnumerable<Token> GetTokens()
@@ -198,7 +197,7 @@ namespace Lox
             }
 
             // consume character in case it matches
-            _current++;
+            Next();
             return true;
         }
 
@@ -219,7 +218,7 @@ namespace Lox
                         return '\0';
                     }
 
-                    return _source[_current + 1];
+                    return _source[_current + num];
                 default:
                     throw new NotSupportedException($"Look Ahead of {num} is not supported.");
             }
@@ -295,6 +294,7 @@ namespace Lox
             }
 
             string? text = _source.Substring(_start, _current - _start);
+
             if (Keywords.TryGetValue(text, out TokenType tokenType))
             {
                 AddToken(tokenType);

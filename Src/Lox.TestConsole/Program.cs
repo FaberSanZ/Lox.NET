@@ -8,7 +8,7 @@ namespace Lox.TestConsole
         {
             bool main = true;
             string source = File.ReadAllText(@"Test\Program.lox");
-            if (main) source += "let init = Program(); init.Main();";
+            if (main) source += "var init = Program(); init.Main();";
             LoxInterpreter interpreter = new LoxInterpreter();
             interpreter.Run(source);
         }

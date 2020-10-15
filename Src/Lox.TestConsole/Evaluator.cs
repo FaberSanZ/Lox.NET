@@ -133,69 +133,68 @@ namespace Lox
             switch (expression.Kind)
             {
                 case SyntaxKind.PrintStatement:
-                    var e = (expression as PrintStatement).Expression.Kind; 
- 
+                    SyntaxKind kind = (expression as PrintStatement).Expression.Kind;
+
                     object result = Evaluate((expression as PrintStatement).Expression);
-                    Console.WriteLine(result);
-                    return System.ValueTuple.Create();
+                    return ValueTuple.Create();
 
                 case SyntaxKind.ExpressionStatement:
-                    Evaluate(((ExpressionStatement)expression).Expression);
-                    return System.ValueTuple.Create();
+                    Evaluate((expression as ExpressionStatement).Expression);
+                    return ValueTuple.Create();
 
                 case SyntaxKind.VariableDeclarationStatement:
                     return EvaluateVariableDeclartionStatement(expression as VariableDeclarationStatement);
 
                 case SyntaxKind.IfStatement:
-                    return EvaluateIfStatement((IfStatement)expression);
+                    return EvaluateIfStatement(expression as IfStatement);
 
                 case SyntaxKind.WhileStatement:
-                    return EvaluateWhileStatement((WhileStatement)expression);
+                    return EvaluateWhileStatement(expression as WhileStatement);
 
                 case SyntaxKind.BlockStatement:
-                    return EvaluateBlockStatement((BlockStatement)expression);
+                    return EvaluateBlockStatement(expression as BlockStatement);
 
                 case SyntaxKind.FunctionStatement:
-                    return EvaluateFunctionStatement((FunctionStatement)expression);
+                    return EvaluateFunctionStatement(expression as FunctionStatement);
 
                 case SyntaxKind.ClassStatement:
-                    return EvaluateClassStatement((ClassStatement)expression);
+                    return EvaluateClassStatement(expression as ClassStatement);
 
                 case SyntaxKind.ReturnStatement:
-                    return EvaluateReturnStatement((ReturnStatement)expression);
+                    return EvaluateReturnStatement(expression as ReturnStatement);
 
                 case SyntaxKind.CallExpression:
-                    return EvaluateCallExpression((CallExpression)expression);
+                    return EvaluateCallExpression(expression as CallExpression);
 
                 case SyntaxKind.VariableExpression:
-                    return EvaluateVariableExpression((VariableExpression)expression);
+                    return EvaluateVariableExpression(expression as VariableExpression);
 
                 case SyntaxKind.AssignmentExpression:
-                    return EvaluateAssignmentExpression((AssignmentExpression)expression);
+                    return EvaluateAssignmentExpression(expression as AssignmentExpression);
 
                 case SyntaxKind.BinaryExpression:
-                    return EvaluateBinaryExpression((BinaryExpression)expression);
+                    return EvaluateBinaryExpression(expression as BinaryExpression);
 
                 case SyntaxKind.GroupingExpression:
-                    return EvaluateGroupingExpression((GroupingExpression)expression);
+                    return EvaluateGroupingExpression(expression as GroupingExpression);
 
                 case SyntaxKind.UnaryExpression:
-                    return EvaluateUnaryExpression((UnaryExpression)expression);
+                    return EvaluateUnaryExpression(expression as UnaryExpression);
 
                 case SyntaxKind.LiteralExpression:
-                    return EvaluateLiteralExpression((LiteralExpression)expression);
+                    return EvaluateLiteralExpression(expression as LiteralExpression);
 
                 case SyntaxKind.GetExpression:
-                    return EvaluateGetExpression((GetExpression)expression);
+                    return EvaluateGetExpression(expression as GetExpression);
 
                 case SyntaxKind.SetExpression:
-                    return EvaluateSetExpression((SetExpression)expression);
+                    return EvaluateSetExpression(expression as SetExpression);
 
                 case SyntaxKind.ThisExpression:
-                    return EvaluateThisExpression((ThisExpression)expression);
+                    return EvaluateThisExpression(expression as ThisExpression);
 
                 case SyntaxKind.SuperExpression:
-                    return EvaluateSuperExpression((SuperExpression)expression);
+                    return EvaluateSuperExpression(expression as SuperExpression);
 
                 default:
                     throw new NotSupportedException();
@@ -205,11 +204,11 @@ namespace Lox
         private object EvaluateSuperExpression(SuperExpression expr)
         {
             int distance = _locals[expr];
-            LoxClass superclass = (LoxClass)_environment.GetAt(distance, new Token(TokenType.Super, "super", null, 0));
-            LoxInstance obj = (LoxInstance)_environment.GetAt(distance - 1, new Token(TokenType.This, "this", null, 0));
+            LoxClass superclass = _environment.GetAt(distance, new Token(TokenType.Super, "super", null, 0)) as LoxClass;
+            LoxInstance obj = _environment.GetAt(distance - 1, new Token(TokenType.This, "this", null, 0)) as LoxInstance;
 
             LoxFunction method = superclass.FindMethod(expr.Method.Lexeme);
-            if (method == null)
+            if (method is null)
             {
                 throw new RuntimeError(expr.Method, $"Undefine property {expr.Method.Lexeme}");
             }
@@ -224,7 +223,7 @@ namespace Lox
             object obj = Evaluate(expr.Object);
 
             LoxInstance instance = obj as LoxInstance;
-            if (instance == null)
+            if (instance is null)
             {
                 throw new RuntimeError(expr.Name, "Only instances have fields");
             }
@@ -236,6 +235,7 @@ namespace Lox
         private object EvaluateGetExpression(GetExpression expr)
         {
             object obj = Evaluate(expr.Object);
+
             if (obj is LoxInstance o)
             {
                 return o.Get(expr.Name);
@@ -246,17 +246,18 @@ namespace Lox
         private object EvaluateClassStatement(ClassStatement expr)
         {
             object superclass = null;
-            if (expr.SuperClass != null)
+
+            if (expr.SuperClass is not null)
             {
                 superclass = Evaluate(expr.SuperClass);
-                if (!(superclass is LoxClass))
+                if (!(superclass is LoxClass loxClass))
                 {
                     throw new RuntimeError(expr.SuperClass.Name, "Superclass must be a class");
                 }
             }
             _environment.Define(expr.Name.Lexeme, null);
 
-            if (expr.SuperClass != null)
+            if (expr.SuperClass is not null)
             {
                 _environment = new Environment(_environment);
                 _environment.Define("super", superclass);
@@ -268,8 +269,9 @@ namespace Lox
                 LoxFunction function = new LoxFunction(method, _environment, method.Name.Lexeme.Equals("constructor"));
                 methods.Add(method.Name.Lexeme, function);
             }
-            LoxClass klass = new LoxClass(expr.Name.Lexeme, (LoxClass)superclass, methods);
-            if (superclass != null)
+            LoxClass klass = new LoxClass(expr.Name.Lexeme, superclass as LoxClass, methods);
+
+            if (superclass is not null)
             {
                 _environment = _environment.Enclosing;
             }
@@ -280,7 +282,7 @@ namespace Lox
         {
 
             object value = null;
-            if (expr.Value != null)
+            if (expr.Value is not null)
             {
                 value = Evaluate(expr.Value);
             }
@@ -330,7 +332,7 @@ namespace Lox
             {
                 Evaluate(expr.ThenBranch);
             }
-            else if (expr.ElseBranch != null)
+            else if (expr.ElseBranch is not null)
             {
                 Evaluate(expr.ElseBranch);
             }
@@ -379,7 +381,7 @@ namespace Lox
         private object EvaluateVariableDeclartionStatement(VariableDeclarationStatement expr)
         {
             object value = null;
-            if (expr.Initializer != null)
+            if (expr.Initializer is not null)
             {
                 value = Evaluate(expr.Initializer);
             }
@@ -436,7 +438,7 @@ namespace Lox
         {
             object left = Evaluate(expr.Left);
             object right = null;
-            if (!(expr.Operator.Type == TokenType.AndAnd || expr.Operator.Type == TokenType.OrOr))
+            if (!(expr.Operator.Type is TokenType.AndAnd || expr.Operator.Type is TokenType.OrOr))
             {
                 right = Evaluate(expr.Right);
             }

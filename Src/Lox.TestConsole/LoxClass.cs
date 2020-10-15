@@ -54,7 +54,7 @@ namespace Lox
         {
             LoxInstance instance = new LoxInstance(this);
             LoxFunction initializer = FindMethod(Name);
-            if (initializer != null)
+            if (initializer is not null)
             {
                 initializer.Bind(instance).Call(evaluator, arguments);
             }

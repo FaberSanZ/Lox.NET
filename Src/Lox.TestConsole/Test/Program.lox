@@ -1,6 +1,6 @@
 class Console 
 {
-    Console(str) 
+    Console(str) // Constructor
     {
 	    this.name = str;
     }
@@ -25,7 +25,7 @@ class Program
 
     Main()
     {
-        let cw = Console("Debug Init");
+        let cw = Console("Debug Init"); // init Constructor
 
         cw.Write("Hello Word 0");
         cw.Write("Hello Word 1");
