@@ -1,40 +1,41 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Lox
 {
-    sealed class LoxInterpreter
+    public class LoxInterpreter
     {
         private bool _hadError = false;
-        private Evaluator _evaluator = new Evaluator();
+        private readonly Evaluator _evaluator = new Evaluator();
         public bool Run(string source)
         {
-            var scanner = new Lexer(source);
+            Lexer scanner = new Lexer(source);
             scanner.ScanTokens();
 
-            var parser = new Parser(scanner.GetTokens().ToList());
-            var expressionTree = parser.Parse();
+            Parser parser = new Parser(scanner.GetTokens().ToList());
+            List<SyntaxNode> expressionTree = parser.Parse();
 
-            foreach (var error in scanner.GetErrors())
+            foreach (Error error in scanner.GetErrors())
             {
-                Report(error.Line, error.Where , error.Message);
+                Report(error.Line, error.Where, error.Message);
             }
 
-            foreach (var error in parser.GetErrors())
+            foreach (Error error in parser.GetErrors())
             {
-                Report(error.Line, error.Where,  error.Message);
+                Report(error.Line, error.Where, error.Message);
             }
 
-            var resolver = new Resolver(_evaluator);
+            Resolver resolver = new Resolver(_evaluator);
             resolver.Resolve(expressionTree);
 
-            var runEvaluator = true;
-             foreach (var error in resolver.GetErrors())
+            bool runEvaluator = true;
+            foreach (Error error in resolver.GetErrors())
             {
-                Report(error.Line, error.Where,  error.Message);
+                Report(error.Line, error.Where, error.Message);
                 runEvaluator = false;
             }
-         
+
             if (runEvaluator)
             {
                 try
@@ -46,7 +47,7 @@ namespace Lox
                     Report(error.Token.Line, "", error.Message);
                 }
             }
-            
+
             return _hadError;
         }
 

@@ -9,13 +9,18 @@ namespace Lox
 
         public VariableExpression SuperClass {get;}
 
-        public SyntaxKind Kind => SyntaxKind.ClassStatement;
+        public override SyntaxKind Kind => SyntaxKind.ClassStatement;
 
         public ClassStatement(Token name, VariableExpression superclass, List<FunctionStatement> methods)
         {
             Name = name;
             Methods = methods;
             SuperClass = superclass;
+        }
+
+        public override IEnumerable<SyntaxNode> GetChildren()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

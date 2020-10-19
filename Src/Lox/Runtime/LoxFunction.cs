@@ -31,11 +31,11 @@ namespace Lox
             }
             catch (Return ret)
             {
-                if (_isInitializer) return _closure.GetAt(0, new Token(TokenType.This, "this", null, 0));
+                if (_isInitializer) return _closure.GetAt(0, new Token(SyntaxKind.This, "this", null, 0));
                 return ret.Value;
             }
 
-            if (_isInitializer) return _closure.GetAt(0, new Token(TokenType.This, "this", null, 0));
+            if (_isInitializer) return _closure.GetAt(0, new Token(SyntaxKind.This, "this", null, 0));
             return null;
         }
 

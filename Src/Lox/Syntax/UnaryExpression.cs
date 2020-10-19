@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Lox
 {
@@ -13,7 +15,12 @@ namespace Lox
             Right = right;
         }
 
-        public SyntaxKind Kind => SyntaxKind.UnaryExpression;
+        public override SyntaxKind Kind => SyntaxKind.UnaryExpression;
+
+        public override IEnumerable<SyntaxNode> GetChildren()
+        {
+            return Array.Empty<SyntaxNode>().ToArray().AsEnumerable();
+        }
 
 
         //public IEnumerable<SyntaxNode> GetNodes()

@@ -14,25 +14,25 @@ namespace Lox
         private int _current = 0;
         private int _line = 1;
 
-        internal readonly Dictionary<string, TokenType> Keywords = new Dictionary<string, TokenType>
+        internal readonly Dictionary<string, SyntaxKind> Keywords = new Dictionary<string, SyntaxKind>
         {
-            ["if"] = TokenType.If,
-            ["else"] = TokenType.Else,
-            ["true"] = TokenType.True,
-            ["false"] = TokenType.False,
-            ["and"] = TokenType.AndAnd,
-            ["or"] = TokenType.OrOr,
-            ["for"] = TokenType.For,
-            ["while"] = TokenType.While,
-            ["funtion"] = TokenType.Fun,
-            ["null"] = TokenType.Nil,
-            ["return"] = TokenType.Return,
-            ["class"] = TokenType.Class,
-            ["this"] = TokenType.This,
-            ["super"] = TokenType.Super,
-            ["let"] = TokenType.Var,
-            ["var"] = TokenType.Var,
-            ["print"] = TokenType.Print,
+            ["if"] = SyntaxKind.If,
+            ["else"] = SyntaxKind.Else,
+            ["true"] = SyntaxKind.True,
+            ["false"] = SyntaxKind.False,
+            ["and"] = SyntaxKind.AndAnd,
+            ["or"] = SyntaxKind.OrOr,
+            ["for"] = SyntaxKind.For,
+            ["while"] = SyntaxKind.While,
+            ["funtion"] = SyntaxKind.Fun,
+            ["null"] = SyntaxKind.Nil,
+            ["return"] = SyntaxKind.Return,
+            ["class"] = SyntaxKind.Class,
+            ["this"] = SyntaxKind.This,
+            ["super"] = SyntaxKind.Super,
+            ["let"] = SyntaxKind.Var,
+            ["var"] = SyntaxKind.Var,
+            ["print"] = SyntaxKind.Print,
         };
 
         internal IEnumerable<Token> GetTokens()
@@ -61,7 +61,7 @@ namespace Lox
                 ScanToken();
             }
 
-            _tokens.Add(new Token(TokenType.Eof, "", None, _line));
+            _tokens.Add(new Token(SyntaxKind.Eof, "", None, _line));
         }
 
         private bool IsAtEnd => _current >= _source.Length;
@@ -75,57 +75,57 @@ namespace Lox
             {
                 case '(':
                    // Advance();
-                    AddToken(TokenType.LeftParen); 
+                    AddToken(SyntaxKind.LeftParen); 
                     break;
 
                 case ')':
                     //Advance();
-                    AddToken(TokenType.RightParen); 
+                    AddToken(SyntaxKind.RightParen); 
                     break;
 
                 case '{': 
-                    AddToken(TokenType.LeftBrace); 
+                    AddToken(SyntaxKind.LeftBrace); 
                     break;
 
                 case '}': 
-                    AddToken(TokenType.RightBrace); 
+                    AddToken(SyntaxKind.RightBrace); 
                     break;
 
-                case ',': AddToken(TokenType.Comma); 
+                case ',': AddToken(SyntaxKind.Comma); 
                     break;
 
-                case '.': AddToken(TokenType.Dot); 
+                case '.': AddToken(SyntaxKind.Dot); 
                     break;
 
-                case '-': AddToken(TokenType.Minus); 
+                case '-': AddToken(SyntaxKind.Minus); 
                     break;
 
-                case '+': AddToken(TokenType.Plus); 
+                case '+': AddToken(SyntaxKind.Plus); 
                     break;
 
-                case ';': AddToken(TokenType.Semicolon); 
+                case ';': AddToken(SyntaxKind.Semicolon); 
                     break;
 
-                case '*': AddToken(TokenType.Star); 
+                case '*': AddToken(SyntaxKind.Star); 
                     break;
 
 
-                case '!': AddToken(Match('=') ? TokenType.BangEqual : TokenType.Bang); 
+                case '!': AddToken(Match('=') ? SyntaxKind.BangEqual : SyntaxKind.Bang); 
                     break;
 
-                case '=': AddToken(Match('=') ? TokenType.EqualEqual : TokenType.Equal); 
+                case '=': AddToken(Match('=') ? SyntaxKind.EqualEqual : SyntaxKind.Equal); 
                     break;
 
-                case '<': AddToken(Match('=') ? TokenType.LessEqual : TokenType.Less); 
+                case '<': AddToken(Match('=') ? SyntaxKind.LessEqual : SyntaxKind.Less); 
                     break;
 
-                case '>': AddToken(Match('=') ? TokenType.GreaterEqual : TokenType.Greater); 
+                case '>': AddToken(Match('=') ? SyntaxKind.GreaterEqual : SyntaxKind.Greater); 
                     break;
 
-                case '&': AddToken(TokenType.And); 
+                case '&': AddToken(SyntaxKind.And); 
                     break;
 
-                case '|': AddToken(TokenType.Or); 
+                case '|': AddToken(SyntaxKind.Or); 
                     break;
 
 
@@ -139,7 +139,7 @@ namespace Lox
                     }
                     else
                     {
-                        AddToken(TokenType.Slash);
+                        AddToken(SyntaxKind.Slash);
                     }
                     break;
 
@@ -225,12 +225,12 @@ namespace Lox
 
         }
 
-        private void AddToken(TokenType type)
+        private void AddToken(SyntaxKind type)
         {
             AddToken(type, None);
         }
 
-        private void AddToken(TokenType type, object literal)
+        private void AddToken(SyntaxKind type, object literal)
         {
             string text = _source.Substring(_start, _current - _start);
             _tokens.Add(new Token(type, text, literal, _line));
@@ -264,7 +264,7 @@ namespace Lox
             Next();
 
             string value = _source.Substring(_start + 1, _current - _start - 2 /*remove quotes*/);
-            AddToken(TokenType.String, value);
+            AddToken(SyntaxKind.String, value);
         }
 
         private void Number()
@@ -283,7 +283,7 @@ namespace Lox
                 }
             }
 
-            AddToken(TokenType.Number, double.Parse(_source.Substring(_start, _current - _start)));
+            AddToken(SyntaxKind.Number, double.Parse(_source.Substring(_start, _current - _start)));
         }
 
         private void Identifier()
@@ -295,13 +295,13 @@ namespace Lox
 
             string? text = _source.Substring(_start, _current - _start);
 
-            if (Keywords.TryGetValue(text, out TokenType tokenType))
+            if (Keywords.TryGetValue(text, out SyntaxKind tokenType))
             {
                 AddToken(tokenType);
             }
             else
             {
-                AddToken(TokenType.Identifier);
+                AddToken(SyntaxKind.Identifier);
             }
         }
 

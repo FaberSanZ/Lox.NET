@@ -9,7 +9,7 @@ namespace Lox
 
         public List<SyntaxNode> Arguments {get;}
 
-        public SyntaxKind Kind => SyntaxKind.CallExpression;
+        public override SyntaxKind Kind => SyntaxKind.CallExpression;
 
         public CallExpression(SyntaxNode callee, Token paren, List<SyntaxNode> arguments)
         {
@@ -18,5 +18,9 @@ namespace Lox
             Arguments = arguments;
         }
 
+        public override IEnumerable<SyntaxNode> GetChildren()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

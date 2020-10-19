@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace Lox
 {
-    sealed class Resolver 
+    internal sealed class Resolver
     {
-        enum FunctionType 
+        private enum FunctionType
         {
             None,
             Function,
@@ -13,20 +13,20 @@ namespace Lox
             Initializer,
         }
 
-        enum ClassType 
+        private enum ClassType
         {
-            None, 
+            None,
             Class,
 
             SubClass,
         }
-        private Evaluator _evaluator;
-        private List<Dictionary<string, bool>> _scopes = new List<Dictionary<string, bool>>();
+        private readonly Evaluator _evaluator;
+        private readonly List<Dictionary<string, bool>> _scopes = new List<Dictionary<string, bool>>();
 
         private FunctionType _currentFunction = FunctionType.None;
         private ClassType _currentClass = ClassType.None;
 
-          private List<Error> _errors = new List<Error>();
+        private readonly List<Error> _errors = new List<Error>();
 
         public IEnumerable<Error> GetErrors()
         {
@@ -35,19 +35,23 @@ namespace Lox
 
         private void Error(Token token, string message)
         {
-            if (token.Type == TokenType.Eof)
+            if (token.Kind == SyntaxKind.Eof)
+            {
                 _errors.Add(new Error(ErrorType.SyntaxError, token.Line, " at end", message));
+            }
             else
+            {
                 _errors.Add(new Error(ErrorType.SyntaxError, token.Line, $" at '{token.Lexeme}'", message));
+            }
         }
 
         public Resolver(Evaluator evaluator)
         {
             _evaluator = evaluator;
         }
-         public void Resolve(List<SyntaxNode> expressions)
+        public void Resolve(List<SyntaxNode> expressions)
         {
-            foreach (var expression in expressions)
+            foreach (SyntaxNode expression in expressions)
             {
                 Resolve(expression);
             }
@@ -58,7 +62,7 @@ namespace Lox
         {
             switch (expression.Kind)
             {
-                 case SyntaxKind.BlockStatement:
+                case SyntaxKind.BlockStatement:
                     ResolveBlockStatement((BlockStatement)expression);
                     break;
                 case SyntaxKind.VariableDeclarationStatement:
@@ -67,7 +71,7 @@ namespace Lox
                 case SyntaxKind.VariableExpression:
                     ResolveVariableExpression((VariableExpression)expression);
                     break;
-                 case SyntaxKind.AssignmentExpression:
+                case SyntaxKind.AssignmentExpression:
                     ResolveAssignmentExpression((AssignmentExpression)expression);
                     break;
                 case SyntaxKind.FunctionStatement:
@@ -77,7 +81,7 @@ namespace Lox
                     Resolve(((ExpressionStatement)expression).Expression);
                     break;
                 case SyntaxKind.IfStatement:
-                    ResolveIfStatement((IfStatement)expression); 
+                    ResolveIfStatement((IfStatement)expression);
                     break;
                 case SyntaxKind.PrintStatement:
                     Resolve(((PrintStatement)expression).Expression);
@@ -134,18 +138,29 @@ namespace Lox
 
         private void Declare(Token name)
         {
-            if (_scopes.Count == 0) return;
-            var scope = _scopes[_scopes.Count - 1];
+            if (_scopes.Count == 0)
+            {
+                return;
+            }
+
+            Dictionary<string, bool> scope = _scopes[_scopes.Count - 1];
             if (scope.ContainsKey(name.Lexeme))
+            {
                 Error(name, "Variable with this name already declared in this scope.");
-            scope[name.Lexeme] =  false;
+            }
+
+            scope[name.Lexeme] = false;
         }
 
         private void Define(Token name)
         {
-            if (_scopes.Count == 0) return;
-            var scope = _scopes[_scopes.Count - 1];
-            scope[name.Lexeme]= true;
+            if (_scopes.Count == 0)
+            {
+                return;
+            }
+
+            Dictionary<string, bool> scope = _scopes[_scopes.Count - 1];
+            scope[name.Lexeme] = true;
         }
 
         private void ResolveSuperExpression(SuperExpression expr)
@@ -176,16 +191,19 @@ namespace Lox
 
         private void ResolveBlockStatement(BlockStatement expr)
         {
-             BeginScope();
-             Resolve(expr.Statements);
-             EndScope();
+            BeginScope();
+            Resolve(expr.Statements);
+            EndScope();
         }
 
         private void ResolveVariableDeclarationStatement(VariableDeclarationStatement expr)
         {
             Declare(expr.Name);
             if (expr.Initializer != null)
+            {
                 Resolve(expr.Initializer);
+            }
+
             Define(expr.Name);
         }
 
@@ -193,17 +211,17 @@ namespace Lox
         {
             if (_scopes.Count != 0)
             {
-                if (_scopes[_scopes.Count - 1].TryGetValue(expr.Name.Lexeme, out var value) && value == false)
+                if (_scopes[_scopes.Count - 1].TryGetValue(expr.Name.Lexeme, out bool value) && value == false)
                 {
                     Error(expr.Name, "cannot read local variable in its own initalizer");
                 }
-            } 
+            }
             ResolveLocal(expr, expr.Name);
         }
 
         private void ResolveLocal(SyntaxNode expr, Token name)
         {
-            for (int i = _scopes.Count - 1; i >= 0; i-- )
+            for (int i = _scopes.Count - 1; i >= 0; i--)
             {
                 if (_scopes[i].ContainsKey(name.Lexeme))
                 {
@@ -228,11 +246,11 @@ namespace Lox
 
         private void ResolveFunction(FunctionStatement expr, FunctionType type)
         {
-            var enclosingFunction = _currentFunction;
+            FunctionType enclosingFunction = _currentFunction;
             _currentFunction = type;
 
             BeginScope();
-            foreach( var param in expr.Parameters)
+            foreach (Token param in expr.Parameters)
             {
                 Declare(param);
                 Define(param);
@@ -247,18 +265,25 @@ namespace Lox
         {
             Resolve(expr.Condition);
             Resolve(expr.ThenBranch);
-            if (expr.ElseBranch != null) Resolve(expr.ElseBranch);
+            if (expr.ElseBranch != null)
+            {
+                Resolve(expr.ElseBranch);
+            }
         }
 
         private void ResolveReturnStatement(ReturnStatement expr)
         {
-             if (_currentFunction == FunctionType.None)
+            if (_currentFunction == FunctionType.None)
+            {
                 Error(expr.Keyword, "cannot return from top level code");
-            
+            }
+
             if (expr.Value != null)
             {
                 if (_currentFunction == FunctionType.Initializer)
+                {
                     Error(expr.Keyword, "cannot return a value from initializer.");
+                }
 
                 Resolve(expr.Value);
             }
@@ -279,15 +304,15 @@ namespace Lox
         private void ResolveCallExpression(CallExpression expr)
         {
             Resolve(expr.Callee);
-            foreach(var arg in expr.Arguments)
+            foreach (SyntaxNode arg in expr.Arguments)
             {
                 Resolve(arg);
             }
         }
 
-          private void ResolveClassStatement(ClassStatement expr)
+        private void ResolveClassStatement(ClassStatement expr)
         {
-            var enclosingClass = _currentClass;
+            ClassType enclosingClass = _currentClass;
             _currentClass = ClassType.Class;
             Declare(expr.Name);
             Define(expr.Name);
@@ -311,10 +336,14 @@ namespace Lox
             BeginScope();
             _scopes[_scopes.Count - 1].Add("this", true);
 
-            foreach (var method in expr.Methods)
+            foreach (FunctionStatement method in expr.Methods)
             {
-                var declaration = FunctionType.Method;
-                if (method.Name.Lexeme.Equals("init")) declaration = FunctionType.Initializer;
+                FunctionType declaration = FunctionType.Method;
+                if (method.Name.Lexeme.Equals("init"))
+                {
+                    declaration = FunctionType.Initializer;
+                }
+
                 ResolveFunction(method, declaration);
             }
 
@@ -322,7 +351,10 @@ namespace Lox
             EndScope();
 
             if (expr.SuperClass != null)
+            {
                 EndScope();
+            }
+
             _currentClass = enclosingClass;
         }
 

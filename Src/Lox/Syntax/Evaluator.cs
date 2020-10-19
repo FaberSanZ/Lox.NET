@@ -136,6 +136,7 @@ namespace Lox
                     SyntaxKind kind = (expression as PrintStatement).Expression.Kind;
 
                     object result = Evaluate((expression as PrintStatement).Expression);
+                    Console.WriteLine(result);
                     return ValueTuple.Create();
 
                 case SyntaxKind.ExpressionStatement:
@@ -204,8 +205,8 @@ namespace Lox
         private object EvaluateSuperExpression(SuperExpression expr)
         {
             int distance = _locals[expr];
-            LoxClass superclass = _environment.GetAt(distance, new Token(TokenType.Super, "super", null, 0)) as LoxClass;
-            LoxInstance obj = _environment.GetAt(distance - 1, new Token(TokenType.This, "this", null, 0)) as LoxInstance;
+            LoxClass superclass = _environment.GetAt(distance, new Token(SyntaxKind.Super, "super", null, 0)) as LoxClass;
+            LoxInstance obj = _environment.GetAt(distance - 1, new Token(SyntaxKind.This, "this", null, 0)) as LoxInstance;
 
             LoxFunction method = superclass.FindMethod(expr.Method.Lexeme);
             if (method is null)
@@ -408,12 +409,12 @@ namespace Lox
         private object EvaluateUnaryExpression(UnaryExpression expr)
         {
             object right = Evaluate(expr.Right);
-            switch (expr.Operator.Type)
+            switch (expr.Operator.Kind)
             {
-                case TokenType.Minus:
+                case SyntaxKind.Minus:
                     CheckNumberOperand(expr.Operator, right);
                     return -(double)right;
-                case TokenType.Bang:
+                case SyntaxKind.Bang:
                     return !IsTruthy(right);
             }
             throw new NotSupportedException($"Unexpected unary operator {expr.Operator}");
@@ -438,26 +439,26 @@ namespace Lox
         {
             object left = Evaluate(expr.Left);
             object right = null;
-            if (!(expr.Operator.Type is TokenType.AndAnd || expr.Operator.Type is TokenType.OrOr))
+            if (!(expr.Operator.Kind is SyntaxKind.AndAnd || expr.Operator.Kind is SyntaxKind.OrOr))
             {
                 right = Evaluate(expr.Right);
             }
 
-            switch (expr.Operator.Type)
+            switch (expr.Operator.Kind)
             {
-                case TokenType.Minus:
+                case SyntaxKind.Minus:
                     checkNumberOperands(expr.Operator, left, right);
                     return (double)left - (double)right;
 
-                case TokenType.Star:
+                case SyntaxKind.Star:
                     checkNumberOperands(expr.Operator, left, right);
                     return (double)left * (double)right;
 
-                case TokenType.Slash:
+                case SyntaxKind.Slash:
                     checkNumberOperands(expr.Operator, left, right);
                     return (double)left / (double)right;
 
-                case TokenType.Plus:
+                case SyntaxKind.Plus:
                     if (left is double l && right is double r)
                     {
                         return l + r;
@@ -471,23 +472,23 @@ namespace Lox
                         throw new RuntimeError(expr.Operator, "Operands must be two numbers or two strings.");
                     }
 
-                case TokenType.Greater:
+                case SyntaxKind.Greater:
                     checkNumberOperands(expr.Operator, left, right);
                     return (double)left > (double)right;
-                case TokenType.GreaterEqual:
+                case SyntaxKind.GreaterEqual:
                     checkNumberOperands(expr.Operator, left, right);
                     return (double)left >= (double)right;
-                case TokenType.Less:
+                case SyntaxKind.Less:
                     checkNumberOperands(expr.Operator, left, right);
                     return (double)left < (double)right;
-                case TokenType.LessEqual:
+                case SyntaxKind.LessEqual:
                     checkNumberOperands(expr.Operator, left, right);
                     return (double)left <= (double)right;
-                case TokenType.EqualEqual:
+                case SyntaxKind.EqualEqual:
                     return Equals(left, right);
-                case TokenType.BangEqual:
+                case SyntaxKind.BangEqual:
                     return !Equals(left, right);
-                case TokenType.AndAnd:
+                case SyntaxKind.AndAnd:
                     if (!IsTruthy(left))
                     {
                         return left;
@@ -497,7 +498,7 @@ namespace Lox
                         return Evaluate(expr.Right);
                     }
 
-                case TokenType.OrOr:
+                case SyntaxKind.OrOr:
                     if (IsTruthy(left))
                     {
                         return left;

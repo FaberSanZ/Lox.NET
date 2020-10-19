@@ -20,7 +20,6 @@ class Program
 {
     Program()
     {
-
     }
 
     Main()
@@ -34,6 +33,8 @@ class Program
         cw.WriteDebug();
     }
 }
+    var i = "i";
+    print i; 
 
 
 

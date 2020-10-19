@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Lox
 {
     class SetExpression : SyntaxNode
@@ -6,13 +8,18 @@ namespace Lox
         public SyntaxNode Object {get;}
         public SyntaxNode Value {get;}
 
-        public SyntaxKind Kind => SyntaxKind.SetExpression;
+        public override SyntaxKind Kind => SyntaxKind.SetExpression;
 
         public SetExpression(SyntaxNode expr, Token name, SyntaxNode value)
         {
             Name = name;
             Object = expr;
             Value = value;
+        }
+
+        public override IEnumerable<SyntaxNode> GetChildren()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

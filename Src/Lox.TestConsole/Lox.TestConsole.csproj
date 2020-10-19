@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Lox\Lox.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="Test\Program.lox">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
