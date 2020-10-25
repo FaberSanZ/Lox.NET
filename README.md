@@ -5,7 +5,7 @@
    Lox.NET
   <br>
   
- ## A cross-platform compiler/interpreter .NET Standard implementation of the [Lox](https://github.com/munificent/craftinginterpreters) language.  
+ ## A cross-platform compiler/interpreter .NET Standard implementation of the [Lox](https://github.com/munificent/craftinginterpreters) language Roslyn inspired.  
 </h1>
 
 
